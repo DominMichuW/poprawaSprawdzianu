@@ -1,0 +1,205 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp36
+{
+    public abstract class Produkt
+    {
+        public string Nazwa { get; set; }
+        public string Opis { get; set; }
+        public decimal Cena { get; set; }
+        public int DostepnaIlosc { get; set; }
+    }
+
+    public class Ksiazka : Produkt
+    {
+        public string Autor { get; set; }
+        public int LiczbaStron { get; set; }
+    }
+
+    public class Film : Produkt
+    {
+        public string Rezyser { get; set; }
+        public int Dlugosc { get; set; }
+    }
+
+    public class Elektronika : Produkt
+    {
+        public string Producent { get; set; }
+        public string Model { get; set; }
+    }
+
+    public class Moda : Produkt
+    {
+        public string Marka { get; set; }
+        public string Rozmiar { get; set; }
+    }
+
+    public interface IKoszyk
+    {
+        IEnumerable<Produkt> Produkty { get; }
+        void DodajProdukt(Produkt produkt);
+        void UsunProdukt(Produkt produkt);
+        void OproznijKoszyk();
+    }
+
+    public class Koszyk : IKoszyk
+    {
+        private readonly List<Produkt> _produkty = new List<Produkt>();
+
+        public IEnumerable<Produkt> Produkty => _produkty;
+
+        public void DodajProdukt(Produkt produkt)
+        {
+            _produkty.Add(produkt);
+        }
+
+        public void UsunProdukt(Produkt produkt)
+        {
+            _produkty.Remove(produkt);
+        }
+
+        public void OproznijKoszyk()
+        {
+            _produkty.Clear();
+        }
+    }
+
+    public class Zamowienie
+    {
+        public int Id { get; set; }
+        public List<Produkt> Produkty { get; set; }
+        public DateTime DataZamowienia { get; set; }
+        public decimal CenaCalkowita => Produkty.Sum(p => p.Cena);
+    }
+
+    public class Klient
+    {
+        public int Id { get; set; }
+        public string Imie { get; set; }
+        public string Nazwisko { get; set; }
+        public string Email { get; set; }
+        public string Haslo { get; set; }
+        public List<Zamowienie> Zamowienia { get; set; }
+
+        public void SkladajZamowienie(Koszyk koszyk)
+        {
+            var noweZamowienie = new Zamowienie
+            {
+                Id = Zamowienia.Count + 1,
+                Produkty = koszyk.Produkty.ToList(),
+                DataZamowienia = DateTime.Now
+            };
+            Zamowienia.Add(noweZamowienie);
+            koszyk.OproznijKoszyk();
+        }
+
+        public void PrzegladajHistorieZamowien()
+        {
+            foreach (var zamowienie in Zamowienia)
+            {
+                Console.WriteLine($"Zamówienie nr {zamowienie.Id} z dnia {zamowienie.DataZamowienia:d} o wartości {zamowienie.CenaCalkowita:C}");
+            }
+        }
+        public void PrzedstawSie()
+        {
+            Console.WriteLine("Imię: {0}, Nazwisko: {1}, E-mail: {2}.",Imie,Nazwisko,Email);
+        }
+    }
+
+    public class Konto : Klient
+    {
+        public void EdytujDaneKlienta(string imie, string nazwisko, string email, string haslo)
+        {
+            Imie = imie;
+            Nazwisko = nazwisko;
+            Email = email
+    ;
+            Haslo = haslo;
+        }
+    }
+
+    public class Pracownik
+    {
+        public void DodajProdukt(string nazwa, string opis, decimal cena, int dostepnaIlosc, Produkt produkt)
+        {
+            {
+                nazwa = nazwa;
+                opis = opis;
+                cena = cena;
+                dostepnaIlosc = dostepnaIlosc;
+            };
+        }
+        public void UsunProdukt(List<Produkt> produkty, Produkt produkt)
+        {
+            Console.WriteLine("Produkt usunięty...");
+        }
+
+        public void PrzegladajHistorieZamowien(List<Zamowienie> zamowienia)
+        {
+            Console.WriteLine("Historia zamówień...");
+        }
+
+        internal void DodajProdukt(List<Produkt> produkty, Ksiazka ksiazka)
+        {
+        }
+    }
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Ksiazka ksiazka = new Ksiazka { Nazwa = "Wiedźmin", Opis = "Fantasy", Cena = 39.99m, DostepnaIlosc = 10, Autor = "Andrzej Sapkowski", LiczbaStron = 300 };
+            Film film = new Film { Nazwa = "Gwiezdne wojny: Ostatni Jedi", Opis = "Przygodowy", Cena = 49.99m, DostepnaIlosc = 5, Rezyser = "Rian Johnson", Dlugosc = 152 };
+            Elektronika elektronika = new Elektronika { Nazwa = "Telewizor LG OLED55CX6LA", Opis = "Telewizor OLED 4K", Cena = 5999.99m, DostepnaIlosc = 2, Producent = "LG", Model = "OLED55CX6LA" };
+            Moda moda = new Moda { Nazwa = "Kurtka zimowa", Opis = "Kurtka w stylu miejskim", Cena = 499.99m, DostepnaIlosc = 3, Marka = "Nike", Rozmiar = "M" };
+            Koszyk koszyk = new Koszyk();
+            koszyk.DodajProdukt(ksiazka);
+            koszyk.DodajProdukt(film);
+            koszyk.DodajProdukt(elektronika);
+            koszyk.DodajProdukt(moda);
+
+            Ksiazka ksiazka1 = new Ksiazka { Nazwa = "Harry Potter", Opis = "Fantasy", Cena = 39.99m, DostepnaIlosc = 5, Autor = "J.K> Rowling", LiczbaStron = 500 };
+            Film film1 = new Film { Nazwa = "Scream IV", Opis = "Horror", Cena = 69.99m, DostepnaIlosc = 12, Rezyser = "Wes Craven", Dlugosc = 111 };
+            Elektronika elektronika1 = new Elektronika { Nazwa = "Monitor LED Dell AW2521H 24,5 \" 1920 x 1080 px IPS / PLS", Opis = "Monitor 360Hz", Cena = 2399.99m, DostepnaIlosc = 16, Producent = "Dell", Model = "AW2521H" };
+            Moda moda1 = new Moda { Nazwa = "Kurtka jeansowa", Opis = "Kurtka w stylu retro", Cena = 699.99m, DostepnaIlosc = 3, Marka = "Nike", Rozmiar = "S" };
+            Koszyk koszyk1 = new Koszyk();
+            koszyk1.DodajProdukt(ksiazka1);
+            koszyk1.DodajProdukt(film1);
+            koszyk1.DodajProdukt(elektronika1);
+            koszyk1.DodajProdukt(moda1);
+            Klient klient = new Klient
+            {
+                Id = 1,
+                Imie = "Jan",
+                Nazwisko = "Kowalski",
+                Email = "jan.kowalski@gmail.com",
+                Haslo = "1234",
+                Zamowienia = new List<Zamowienie>()
+            };
+            Klient klient1 = new Klient
+            {
+                Id = 2,
+                Imie = "Dominik",
+                Nazwisko = "Wojciechowski",
+                Email = "dominik.wojciechowski420@gmail.com",
+                Haslo = "password123",
+                Zamowienia = new List<Zamowienie>()
+            };
+            klient.PrzedstawSie();
+            klient.SkladajZamowienie(koszyk);
+            klient1.PrzedstawSie();
+            klient1.SkladajZamowienie(koszyk1);
+            Pracownik pracownik = new Pracownik();
+            pracownik.DodajProdukt(klient.Zamowienia[0].Produkty, new Ksiazka { Nazwa = "Pan Tadeusz", Opis = "Epopeja narodowa", Cena = 29.99m, DostepnaIlosc = 15, Autor = "Adam Mickiewicz", LiczbaStron = 400 });
+            pracownik.UsunProdukt(klient.Zamowienia[0].Produkty, ksiazka);
+            pracownik.PrzegladajHistorieZamowien(klient.Zamowienia);
+            pracownik.PrzegladajHistorieZamowien(klient1.Zamowienia);
+            klient.PrzegladajHistorieZamowien();
+            klient1.PrzegladajHistorieZamowien();
+            Console.ReadLine();
+        }
+    }
+}
